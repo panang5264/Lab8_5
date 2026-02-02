@@ -1,17 +1,8 @@
-FROM python:3.10
-
+FROM jenkins/jenkins:lts
 USER root
-RUN apt-get update && apt-get install -y wget gnupg unzip \
-    && wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" \
-       > /etc/apt/sources.list.d/google-chrome.list \
-    && apt-get update && apt-get install -y google-chrome-stable
+RUN apt-get update && apt-get install -y python3 python3-pip python3-venv lsb-release chromium-driver chromium
 
-
-RUN DRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE") \
-    && wget https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip \
-    && unzip chromedriver_linux64.zip -d /usr/local/bin \
-    && rm chromedriver_linux64.zip
-
-
-RUN pip install robotframework robotframework-seleniumlibrary selenium
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN pip install --upgrade robotframework robotframework-seleniumlibrary selenium websocket-client virtualenv
+USER jenkins
